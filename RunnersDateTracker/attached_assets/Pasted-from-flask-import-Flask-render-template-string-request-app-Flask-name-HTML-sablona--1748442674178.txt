@@ -1,0 +1,80 @@
+from flask import Flask, render_template_string, request
+
+app = Flask(__name__)
+
+# HTML sablona so vstupnym formularom a vysledkom
+HTML_TEMPLATE = """
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="utf-8">
+    <title>Bežecký test kompatibility</title>
+    <style>
+      body { font-family: sans-serif; background: #f9f9f9; padding: 2em; }
+      h1 { color: #444; }
+      .container { max-width: 600px; margin: auto; background: #fff; padding: 2em; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+      label, select, input[type=submit] { display: block; margin-top: 1em; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Bežecký test kompatibility</h1>
+      <form method="post">
+        <label for="you">Tvoje ideálne bežecké rande:</label>
+        <select name="you" id="you">
+          <option value="recovery">Recovery run</option>
+          <option value="temp">Tempový beh</option>
+          <option value="long">Long run</option>
+          <option value="fartlek">Fartlek</option>
+          <option value="sprint">Šprint</option>
+          <option value="marathon">Maratón</option>
+        </select>
+
+        <label for="partner">Partnerovo rande:</label>
+        <select name="partner" id="partner">
+          <option value="recovery">Recovery run</option>
+          <option value="temp">Tempový beh</option>
+          <option value="long">Long run</option>
+          <option value="fartlek">Fartlek</option>
+          <option value="sprint">Šprint</option>
+          <option value="marathon">Maratón</option>
+        </select>
+
+        <input type="submit" value="Vyhodnoť kompatibilitu">
+      </form>
+
+      {% if result %}
+      <hr>
+      <h2>Výsledok:</h2>
+      <p>{{ result }}</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
+"""
+
+# Kombinácie kompatibility (skrátené pre demo)
+COMPATIBILITY = {
+    ("recovery", "recovery"): "92 % – Pokojné duše, ktoré spolu zvládnu aj dlhú zimu.",
+    ("recovery", "temp"): "42 % – Jeden chce podcast, druhý plán. Kompromis nutný.",
+    ("long", "fartlek"): "38 % – Jeden sníva o diaľke, druhý mení tempo každých 5 minút.",
+    ("fartlek", "fartlek"): "77 % – Chaotické, ale zábavné. Aj rozchody budú dobrodružné.",
+    ("temp", "temp"): "65 % – Precízny vzťah na precíznych zónach. Len nech vás neodtiahne rutina.",
+    ("recovery", "sprint"): "21 % – Jeden sa chce rozprávať, druhý už je v cieli.",
+    ("marathon", "marathon"): "100 % alebo 0 % – Osudoví... alebo vyhoríte pri treťom spoločnom tréningu.",
+    ("sprint", "sprint"): "51 % – Intenzívne a krátke. Láska alebo laktát?",
+}
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    result = None
+    if request.method == 'POST':
+        you = request.form['you']
+        partner = request.form['partner']
+        key = (you, partner)
+        rev_key = (partner, you)
+        result = COMPATIBILITY.get(key) or COMPATIBILITY.get(rev_key) or "Neznáma kombinácia. Ale kto vie? Možno práve preto to môže fungovať!"
+    return render_template_string(HTML_TEMPLATE, result=result)
+
+if __name__ == '__main__':
+    app.run(debug=True)
