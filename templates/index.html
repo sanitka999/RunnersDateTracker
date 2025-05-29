@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Bežecký test kompatibility | Running Compatibility Test</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="hero-content text-center text-white">
+                        <i class="fas fa-running hero-icon"></i>
+                        <h1 class="hero-title" id="main-title">
+                            <span class="lang-sk">Bežecký test kompatibility</span>
+                            <span class="lang-en d-none">Running Compatibility Test</span>
+                        </h1>
+                        <p class="hero-subtitle" id="main-subtitle">
+                            <span class="lang-sk">Zistite, ako dobre sa hodíte ako bežeckí partneri</span>
+                            <span class="lang-en d-none">Discover how well you match as running partners</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Language Toggle -->
+                <div class="text-center mb-4">
+                    <div class="btn-group language-toggle" role="group">
+                        <button type="button" class="btn btn-outline-primary" onclick="switchLanguage('sk')" id="btn-sk">
+                            <i class="fas fa-flag"></i> Slovensky
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="switchLanguage('en')" id="btn-en">
+                            <i class="fas fa-flag"></i> English
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Form Card -->
+                <div class="card compatibility-card">
+                    <div class="card-body p-4">
+                        <form id="compatibilityForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="yourType" class="form-label fw-bold">
+                                        <i class="fas fa-user text-primary me-2"></i>
+                                        <span class="lang-sk">Tvoj ideálny bežecký štýl:</span>
+                                        <span class="lang-en d-none">Your ideal running style:</span>
+                                    </label>
+                                    <select class="form-select form-select-lg" id="yourType" name="your_type" required>
+                                        <option value="">
+                                            <span class="lang-sk">Vyber svoj štýl...</span>
+                                            <span class="lang-en d-none">Choose your style...</span>
+                                        </option>
+                                        {% for key, value in running_types.items() %}
+                                        <option value="{{ key }}" data-desc-sk="{{ value.sk.desc }}" data-desc-en="{{ value.en.desc }}">
+                                            <span class="lang-sk">{{ value.sk.name }}</span>
+                                            <span class="lang-en d-none">{{ value.en.name }}</span>
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text" id="yourTypeDesc"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label for="partnerType" class="form-label fw-bold">
+                                        <i class="fas fa-heart text-danger me-2"></i>
+                                        <span class="lang-sk">Partnerov bežecký štýl:</span>
+                                        <span class="lang-en d-none">Partner's running style:</span>
+                                    </label>
+                                    <select class="form-select form-select-lg" id="partnerType" name="partner_type" required>
+                                        <option value="">
+                                            <span class="lang-sk">Vyber partnerov štýl...</span>
+                                            <span class="lang-en d-none">Choose partner's style...</span>
+                                        </option>
+                                        {% for key, value in running_types.items() %}
+                                        <option value="{{ key }}" data-desc-sk="{{ value.sk.desc }}" data-desc-en="{{ value.en.desc }}">
+                                            <span class="lang-sk">{{ value.sk.name }}</span>
+                                            <span class="lang-en d-none">{{ value.en.name }}</span>
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text" id="partnerTypeDesc"></div>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5" id="calculateBtn">
+                                    <i class="fas fa-calculator me-2"></i>
+                                    <span class="lang-sk">Vyhodnoť kompatibilitu</span>
+                                    <span class="lang-en d-none">Calculate Compatibility</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="text-center mt-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">
+                        <span class="lang-sk">Vypočítavam kompatibilitu...</span>
+                        <span class="lang-en d-none">Calculating compatibility...</span>
+                    </p>
+                </div>
+
+                <!-- Results Card -->
+                <div id="resultsCard" class="card result-card mt-4 d-none">
+                    <div class="card-body text-center p-4">
+                        <div class="result-icon mb-3">
+                            <i class="fas fa-heart-pulse"></i>
+                        </div>
+                        <h3 class="result-title mb-3">
+                            <span class="lang-sk">Výsledok kompatibility</span>
+                            <span class="lang-en d-none">Compatibility Result</span>
+                        </h3>
+                        
+                        <div class="compatibility-score mb-4">
+                            <div class="score-circle">
+                                <span id="scoreValue" class="score-number">0</span>
+                                <span class="score-percent">%</span>
+                            </div>
+                            <div class="compatibility-level mt-3">
+                                <span id="compatibilityLevel" class="level-badge"></span>
+                            </div>
+                        </div>
+
+                        <div class="result-description">
+                            <p id="resultDescription" class="lead"></p>
+                        </div>
+
+                        <div class="result-actions mt-4">
+                            <button class="btn btn-outline-primary me-2" onclick="resetForm()">
+                                <i class="fas fa-redo me-2"></i>
+                                <span class="lang-sk">Skúsiť znovu</span>
+                                <span class="lang-en d-none">Try Again</span>
+                            </button>
+                            <button class="btn btn-success" onclick="shareResult()">
+                                <i class="fas fa-share me-2"></i>
+                                <span class="lang-sk">Zdieľať</span>
+                                <span class="lang-en d-none">Share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Section -->
+                <div class="card tips-card mt-5">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            <span class="lang-sk">Tipy pre bežecké páry</span>
+                            <span class="lang-en d-none">Tips for Running Couples</span>
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="tips-list lang-sk">
+                                    <li>Komunikujte o svojich cieľoch a preferenciách</li>
+                                    <li>Striedajte tréningy podľa oboch štýlov</li>
+                                    <li>Rešpektujte rozdielne tempo a výkonnosť</li>
+                                    <li>Naplánujte si spoločné bežecké dobrodružstvá</li>
+                                </ul>
+                                <ul class="tips-list lang-en d-none">
+                                    <li>Communicate about your goals and preferences</li>
+                                    <li>Alternate workouts according to both styles</li>
+                                    <li>Respect different paces and performance levels</li>
+                                    <li>Plan shared running adventures together</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="tips-list lang-sk">
+                                    <li>Použite technológie na sledovanie pokroku</li>
+                                    <li>Motivujte sa navzájom v ťažkých chvíľach</li>
+                                    <li>Oslavujte spoločné úspechy a míľniky</li>
+                                    <li>Buďte trpezliví a podporujúci</li>
+                                </ul>
+                                <ul class="tips-list lang-en d-none">
+                                    <li>Use technology to track progress together</li>
+                                    <li>Motivate each other during tough moments</li>
+                                    <li>Celebrate shared successes and milestones</li>
+                                    <li>Be patient and supportive</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-running me-2"></i>
+                <span class="lang-sk">Vytvorené s láskou pre bežeckú komunitu</span>
+                <span class="lang-en d-none">Made with love for the running community</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
