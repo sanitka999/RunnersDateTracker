@@ -35,16 +35,16 @@ RUNNING_TYPES = {
         'sk': {'name': 'Šprint', 'desc': 'Maximálne úsilie na krátku vzdialenosť'}
     },
     'marathon': {
-        'en': {'name': 'Marathon Training', 'desc': 'Long-distance endurance focused'},
-        'sk': {'name': 'Maratónsky tréning', 'desc': 'Zameranie na dlhé vzdialenosti'}
+        'en': {'name': 'Marathon', 'desc': 'Long-distance endurance focused'},
+        'sk': {'name': 'Maratón', 'desc': 'Zameranie na dlhé vzdialenosti'}
     },
     'trail': {
         'en': {'name': 'Trail Running', 'desc': 'Off-road adventure running'},
         'sk': {'name': 'Trail beh', 'desc': 'Beh v prírode mimo ciest'}
     },
     'hill': {
-        'en': {'name': 'Hill Training', 'desc': 'Uphill strength and power building'},
-        'sk': {'name': 'Kopčekový tréning', 'desc': 'Budovanie sily a výkonu do kopca'}
+        'en': {'name': 'Hill Run', 'desc': 'Uphill strength and power building'},
+        'sk': {'name': 'Kopčeky', 'desc': 'Budovanie sily a výkonu do kopca'}
     }
 }
 
